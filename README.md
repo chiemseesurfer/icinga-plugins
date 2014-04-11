@@ -59,3 +59,6 @@ Jenkins plugin uses `/etc/init.d/jenkins status` to get the status of the servic
 To enable this call for nagios user add following line to `/etc/sudoers`:
 
     nagios ALL=NOPASSWD:/etc/init.d/jenkins status
+
+For this plugin replace `check_NAME` in [Server side]() and [Client side]() with
+`check_jenkins`.
