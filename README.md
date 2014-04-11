@@ -18,7 +18,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 Table of Contents
 =================
 1. [Introduction](#introduction)
-2. [Installation/Configuration](#installation/configuration)
+2. [Installation/Configuration](#installationconfiguration)
 
 
 Introduction
