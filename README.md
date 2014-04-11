@@ -21,14 +21,14 @@ Table of Contents
 2. [Installation/Configuration](#installation/configuration)
 
 
-1. Introduction
+Introduction
 =================
 Customized scripts to use with icinga monitoring tool on debian. These scripts
 should be stored into the nagios plugin folder (/usr/lib/nagios/plugins) of the
 hosts you want to monitor. They will be executed via nrpe daemon.
 
 
-2. Installation/Configuration
+Installation/Configuration
 =================
 ## Server side
 
