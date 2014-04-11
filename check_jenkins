@@ -1,0 +1,84 @@
+#!/bin/sh
+#
+# Copyright (c) 2013-2014 Max Oberberger (max@oberbergers.de)
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License 
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# icinga/nagios check to monitor jenkins
+#
+# 1. check if configfile exists
+# 2. check status of service
+
+# configure global variables
+STATE_OK=0
+STATE_WARNING=1
+STATE_CRITICAL=2
+STATE_UNKNOWN=3
+
+# Check if configfile exists
+CONFIGFILE="/var/lib/jenkins/config.xml"
+
+if [ -f $CONFIGFILE ];
+then
+   FILE="OK: Config file $CONFIGFILE is present"
+   FSTATE=$STATE_OK
+else
+   FILE="CRITICAL Config file $CONFIGFILE does not exists"
+   FSTATE=$STATE_CRITICAL
+fi
+
+# Check service status
+RUNNING_STATUS=`sudo /etc/init.d/jenkins status`
+
+case "$RUNNING_STATUS" in
+   *"running"*)
+      SERVICE="OK: $RUNNING_STATUS"
+      SSTATE=$STATE_OK
+   ;;
+   *"stopped"*)
+      SERVICE="WARNING: $RUNNING_STATUS"
+      SSTATE=$STATE_WARNING
+   ;;
+   *)
+      SERVICE="CRITICAL: jenkins service is not running"
+      SSTATE=$STATE_CRITICAL
+   ;;
+esac
+
+# Print combined status to commandline -> is displayed in icinga
+echo "$SERVICE / $FILE"
+
+# Retrieving the correct state for icinga and distributing it
+if [ $SSTATE -lt 0 -o $SSTATE -gt 3 -o $FSTATE -lt 0 -o $FSTATE -gt 3 ]; then
+  STATE=$STATE_UNKNOWN
+elif [ $SSTATE -eq 0 -a $FSTATE -eq 0 ]; then
+    STATE=$STATE_OK
+elif [ $SSTATE -eq 1 -a $FSTATE -eq 1 ]; then
+    STATE=$STATE_WARNING
+elif [ $SSTATE -eq 2 -a $FSTATE -eq 2 ]; then
+    STATE=$STATE_CRITICAL
+elif [ $SSTATE -eq 3 -a $FSTATE -eq 3 ]; then
+    STATE=$STATE_UNKNOWN
+elif [ $SSTATE -eq 3 -o $FSTATE -eq 3 ]; then
+    STATE=$STATE_UNKNOWN
+elif [ $SSTATE -eq 2 -o $FSTATE -eq 2 ]; then
+    STATE=$STATE_CRITICAL
+elif [ $SSTATE -eq 1 -o $FSTATE -eq 1 ]; then
+    STATE=$STATE_WARNING
+elif [ $SSTATE -eq 0 -o $FSTATE -eq 0 ]; then
+    STATE=$STATE_OK
+else
+  STATE=$STATE_UNKNOWN
+fi
+exit $STATE
